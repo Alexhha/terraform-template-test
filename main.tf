@@ -32,6 +32,7 @@ data "template_file" "metadata_startup_script" {
 
     vars {
         jfrog_cli_version = "${var.jfrog_cli_version}"
+        tf_download_script = "${data.template_file.download_terraform_script.rendered}"
     }
 }
 
@@ -48,30 +49,8 @@ resource "google_compute_instance" "test" {
     machine_type = "${var.gce_type}"
     zone         = "${var.gce_zone}"
 
-/*
-// Doesn't work
     metadata {
         startup-script = "${data.template_file.metadata_startup_script.rendered}"
-    }
-*/
-
-    metadata {
-        startup-script = <<SCRIPT
-#!/bin/bash -x
-
-apt-get update && apt-get install -y mc
-wget 'https://bintray.com/jfrog/jfrog-cli-go/download_file?file_path=${var.jfrog_cli_version}%2Fjfrog-cli-linux-amd64%2Fjfrog' -O /usr/local/bin/jfrog
-chmod +x /usr/local/bin/jfrog
-
-/usr/local/bin/jfrog -v
-
-cat << 'EOF' > /tmp/download_terraform.sh
-${data.template_file.download_terraform_script.rendered}
-EOF
-
-chmod +x /tmp/download_terraform.sh
-/tmp/download_terraform.sh
-SCRIPT
     }
 
     labels = {

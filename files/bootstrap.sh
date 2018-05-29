@@ -9,5 +9,8 @@ chmod +x /usr/local/bin/jfrog
 /usr/local/bin/jfrog -v
 
 cat << 'EOF' > /tmp/download_terraform.sh
-$${data.template_file.download_terraform_script.rendered}
+${tf_download_script}
 EOF
+
+chmod +x /tmp/download_terraform.sh
+/tmp/download_terraform.sh
